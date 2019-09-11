@@ -47,7 +47,7 @@ class NOMIS_CONFIG:
             
     def help_url(self,idx='NM_7_1'):
         metadata=self.nomis_code_metadata(idx)
-        keys=metadata.keys()
+        keys=list(metadata.keys())
         keys.remove('core')
         print('Dataset {idx} ({name}) supports the following dimensions: {dims}.'.format(
                 idx=idx,
@@ -177,7 +177,7 @@ class NOMIS_CONFIG:
                 metadata[dim]=self._nomis_codes_dimension_grab(dim,idx,params=None)
         self.metadata[idx]=metadata       
         if describe=='all':
-            keys= metadata.keys()
+            keys= list(metadata.keys())
             keys.remove('core')
             self._describe_metadata(idx,metadata,keys)
         elif isinstance(describe, str) and describe in metadata.keys():
