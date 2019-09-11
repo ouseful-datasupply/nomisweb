@@ -100,7 +100,8 @@ class NOMIS_CONFIG:
             sc=self._nomis_codes_dimension_grab(dim,idx,params=None)
             dimmap=dict(zip(sc['description'].astype(str),sc['value']))
             keys=dimmap.keys()
-            keys.sort(key=len, reverse=True)
+            #keys.sort(key=len, reverse=True)
+            keys = sorted(keys, reverse=True)
             for s in keys:
                 pattern = re.compile(s, re.IGNORECASE)
                 dims=pattern.sub(str(dimmap[s]), str(dims))
