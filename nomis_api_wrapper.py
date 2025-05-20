@@ -330,7 +330,7 @@ class NOMIS_CONFIG:
     #summarise what dimensions are available, and the value they can take,
     #and provide a stub function usage example (with eligible parameters) to call it
 
-    def _nomis_data_url(self,idx='NM_1_1',postcode=None, areacode=None, **kwargs):
+    def _nomis_data_url(self,idx='NM_1_1',postcode=None, areacode=None, select=None, **kwargs):
 
         #TO DO
         #Add an explain=True parameter that will print a natural language summary of what the command is calling
@@ -375,13 +375,15 @@ class NOMIS_CONFIG:
 
         
         #Set up a default projection for the returned columns
-        cols=['geography_code','geography_name','measures_name','measures','date_code','date_name','obs_value']
-
-        for k in ['sex','age','item']:
-            if k in kwargs: cols.insert(len(cols)-1,'{}_name'.format(k))
+        #cols=['geography_code','geography_name','measures_name','measures','date_code','date_name','obs_value']
         
-        if 'select' not in kwargs:
-            kwargs['select']=','.join(cols)
+        #for k in ['sex','age','item']:
+        #    if k in kwargs: cols.insert(len(cols)-1,'{}_name'.format(k))
+        
+        #if 'select' not in kwargs:
+        #    kwargs['select']=','.join(cols)
+        if select and 'select' not in kwargs:
+            kwargs['select']=','.join(select)
         
         url='{nomis}{idx}.data.csv{params}'.format(nomis=self.url,
                                                   idx=idx,
