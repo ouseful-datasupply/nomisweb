@@ -202,10 +202,16 @@ class NOMIS_CONFIG:
             kf={'agency':keyfamily['agencyid'],
                 'idx':keyfamily['id'],
                 'name':keyfamily['name']['value'],
-                'description': keyfamily['description']['value'] if 'description' in keyfamily else ''
+                'description': keyfamily['description']['value'] if 'description' in keyfamily else '',
+                'source':''
                 #'dimensions':[dimensions['codelist'] for dimensions in keyfamily['components']['dimension']]
             }
-
+            for annotation in keyfamily["annotations"]["annotation"]:
+                if annotation["annotationtitle"]=="contenttype/sources":
+                    kf["source"] = annotation["annotationtext"]
+                elif annotation["annotationtitle"]=="MetadataText0":
+                    if kf["description"]=='':
+                        kf["description"] = annotation["annotationtext"]
             if dimensions:
                 for _dimensions in keyfamily['components']['dimension']:
                     kf['dimension']= _dimensions['codelist']
