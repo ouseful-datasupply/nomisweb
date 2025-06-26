@@ -109,7 +109,8 @@ class NOMIS_CONFIG:
         
     def _sex_map(self,idx,sex):
         return self._dimension_mapper(idx,'sex',sex)
-                
+    
+    # TO DO this is really hacky
     def _get_geo_code_helper(self,helper):
         value=None
         desc=None
@@ -123,7 +124,10 @@ class NOMIS_CONFIG:
 
         return value,desc
 
-    def get_geo_code(self,value=None,desc=None, search=None, helper=None, chase=False):
+    def get_geo_code(self,value=None,desc=None, search=None, helper=None, chase=False, idx=None):
+        if idx is None:
+            print("You need to provide a base dataset idx.")
+            return
         #The semantics of this are quite tricky
         #value is a code for a geography, the thing searched within
         #desc identifies a description within a geography - on a match it takes you to this lower geography
@@ -134,9 +138,9 @@ class NOMIS_CONFIG:
         ##https://www.nomisweb.co.uk/reports/lmp/la/1946157281/report.aspx
         #default
         if helper is not None:
-            value,desc=self._get_geo_code_helper(helper)
+            value, desc=self._get_geo_code_helper(helper)
         if chase:
-            chaser= self.nomis_codes_geog(geography=value)
+            chaser= self.nomis_codes_geog(idx=idx, geography=value)
             if search is not None:
                 chasecands=chaser[ chaser['description'].str.contains(search) ][['description','value']].values
             else:
@@ -146,12 +150,12 @@ class NOMIS_CONFIG:
                 locs.append(chasecand[1])
             if len(locs): value=','.join(map(str,locs))
 
-        geog=self.nomis_codes_geog(geography=value)
+        geog=self.nomis_codes_geog(idx=idx, geography=value)
         if desc is not None:
             candidates=geog[['description','value']].values
             for candidate in candidates:
                 if candidate[0]==desc:
-                    geog=self.nomis_codes_geog(geography=candidate[1])
+                    geog=self.nomis_codes_geog(idx=idx, geography=candidate[1])
 
         if search is not None:
             retval=geog[ geog['description'].str.contains(search) ][['description','value']].values
@@ -240,7 +244,7 @@ class NOMIS_CONFIG:
                 codes_data.append(code_data.copy())
         return pd.DataFrame(codes_data)
 
-    #Generic mininal constructor
+    #Generic minimal constructor
     def _nomis_codes_url_constructor(self,dim,idx,params=None):
         #This doesn't cope with geography properly that can insert an element into the path?
         return '{nomis}{idx}/{dim}.def.sdmx.json{params}'.format(nomis=self.url,
@@ -289,7 +293,6 @@ class NOMIS_CONFIG:
         url=url=self._nomis_codes_url_constructor('duration',idx)
         return self._nomis_codes_parser(url)
     
-
     def nomis_codes_sex(self,idx='NM_1_1',geography=None):
         params={}
         if geography is not None:
@@ -314,7 +317,7 @@ class NOMIS_CONFIG:
         url='{nomis}{idx}/geography{geog}.def.sdmx.json{params}'.format(nomis=self.url,
                                                                        idx=idx,geog=geog,
                                                                        params=self._url_encode(params))
-            
+  
         return self._nomis_codes_parser(url)
     
     def nomis_codes_items(self,idx='NM_1_1',geography=None,sex=None):
